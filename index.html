@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Phản Đòn Tự Vệ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Reset cơ bản */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Nền thiên nhiên thuần túy (không người, không ký tự) */
+        body {
+            background-color: #1a251e;
+            background-image: linear-gradient(rgba(14, 28, 20, 0.75), rgba(14, 28, 20, 0.85)), 
+                              url('https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=3000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Tiêu đề chính */
+        header {
+            text-align: center;
+            padding: 30px 20px 15px;
+        }
+
+        h1 {
+            color: #2ecc71;
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
+            font-size: 2.4rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            color: #a8d5ba;
+            font-size: 1.1rem;
+            margin-top: 5px;
+            letter-spacing: 1px;
+        }
+
+        /* Bố cục chính 2 cột */
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 30px;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Cột trái: Bảng danh sách đòn thế */
+        .playlist-container {
+            flex: 1;
+            min-width: 340px;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            height: 75vh;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .playlist-header {
+            padding: 20px;
+            background: rgba(12, 28, 19, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px 16px 0 0;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #2ecc71;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Danh sách cuộn */
+        .playlist {
+            list-style: none;
+            overflow-y: auto;
+            padding: 12px;
+            flex: 1;
+        }
+
+        .playlist::-webkit-scrollbar {
+            width: 6px;
+        }
+        .playlist::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .playlist::-webkit-scrollbar-thumb {
+            background: rgba(46, 204, 113, 0.5);
+            border-radius: 3px;
+        }
+        .playlist::-webkit-scrollbar-thumb:hover {
+            background: #2ecc71;
+        }
+
+        /* Từng mục đòn thế */
+        .playlist li {
+            padding: 14px 18px;
+            margin-bottom: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            border-left: 4px solid transparent;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .playlist li:hover {
+            background: rgba(46, 204, 113, 0.15);
+            border-left: 4px solid #2ecc71;
+            transform: translateX(4px);
+        }
+
+        .playlist li.active {
+            background: rgba(46, 204, 113, 0.3);
+            border-left: 4px solid #2ecc71;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.2);
+            color: #ffffff;
+        }
+        
+        .list-number {
+            background: rgba(255,255,255,0.1);
+            color: #2ecc71;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 0.85rem;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .playlist li.active .list-number {
+            background: #2ecc71;
+            color: #1a251e;
+        }
+
+        /* Cột phải: Trình phát video YouTube */
+        .video-container {
+            flex: 2;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            background: rgba(12, 28, 19, 0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 25px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .video-title-display {
+            font-size: 1.6rem;
+            color: #ffffff;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(46, 204, 113, 0.3);
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .video-wrapper {
+            width: 100%;
+            position: relative;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            /* Tỉ lệ 16:9 cho YouTube Iframe */
+            padding-bottom: 56.25%; 
+            height: 0;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Tối ưu hiển thị trên thiết bị di động */
+        @media (max-width: 950px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .playlist-container {
+                max-width: 100%;
+                height: 45vh;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Thế Phản Đòn Tự Vệ</h1>
+        <div class="subtitle">Hệ thống 27 kỹ thuật chiến đấu ứng dụng</div>
+    </header>
+
+    <div class="main-container">
+        <div class="playlist-container">
+            <div class="playlist-header">
+                <i class="fas fa-shield-alt"></i> Danh Sách Kỹ Thuật
+            </div>
+            <ul class="playlist" id="playlist">
+                <!-- Danh sách sẽ được tạo tự động bằng JavaScript -->
+            </ul>
+        </div>
+
+        <div class="video-container">
+            <div class="video-title-display" id="currentVideoTitle">
+                <i class="fas fa-fist-raised" style="color: #2ecc71;"></i> 
+                <span>1. Phản Đòn Đá Ngang Số 2</span>
+            </div>
+            <div class="video-wrapper">
+                <!-- Iframe nhúng YouTube -->
+                <iframe id="mainPlayer" 
+                        src="https://www.youtube.com/embed/P3T0YNTADWw?rel=0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const playlist = document.getElementById('playlist');
+            const mainPlayer = document.getElementById('mainPlayer');
+            const currentVideoTitle = document.getElementById('currentVideoTitle').querySelector('span');
+            
+            // Dữ liệu 27 thế phản đòn và ID video YouTube tương ứng
+            const techniques = [
+                { name: "Phản Đòn Đá Ngang Số 2", id: "P3T0YNTADWw" },
+                { name: "Phản Đòn Đá Thẳng Số 2", id: "6BBbSxlwYjg" },
+                { name: "Nắm Tay Cùng Bên Số 2", id: "H9qJGI6lLlo" },
+                { name: "Nắm Tay Khác Bên số 3", id: "fp7vHThMTMA" },
+                { name: "Nắm Tóc Sau Số 2", id: "F-2Yc-HKrrw" },
+                { name: "Nắm Cổ Áo Số 4", id: "hv4cqG1uaHU" },
+                { name: "Phản Đòn Đá Tạt số 1", id: "DIPgTHlX82Q" },
+                { name: "Nắm Tay Khác Bên Số 1", id: "IXrjfB-ibU8" },
+                { name: "Nắm Tóc Sau Số 3", id: "vjdXGwjf6Wc" },
+                { name: "Nắm Tay cùng bên số 1", id: "gNVrHia2Z2Q" },
+                { name: "Nắm Hai Tay Sau Số 1", id: "F70cEstvBU0" },
+                { name: "Phàn Đòn Đá Ngang Số 3", id: "r1w_BJ0eyoI" },
+                { name: "Phàn Đòn Đá Ngang Số 1", id: "hU71_D7G0aI" },
+                { name: "Nắm Hai Tay Sau Số 1", id: "bE3rWBFAkkc" },
+                { name: "Bóp Cổ Trước Số 4", id: "3y407elO4Ak" },
+                { name: "Phản Đòn Đá Thẳng Số 1", id: "wxgQbZWRt8k" },
+                { name: "Nắm Tay Cùng Bên Số 3", id: "t31SJYnYF2I" },
+                { name: "Phản Đòn Đá Tạt Số 3", id: "KL1E0EpYH1U" },
+                { name: "Phản Đòn Đá Tạt Số 4", id: "1qTLNeVm5ks" },
+                { name: "Nắm Cổ áo số 5", id: "FoZ9sgUqqD4" },
+                { name: "Nắm Hai Tay Số 1", id: "rk-TL2HHqW0" },
+                { name: "Nắm Tay Khác Bên Số 2", id: "n4JQS7rorkU" },
+                { name: "Phản Đòn Đá Thẳng Số 3", id: "zzmc4IrZU38" },
+                { name: "Phản Đòn Đá Tạt Số 5", id: "pEFKCZjJEKg" },
+                { name: "Nắm Hai Tay Trước số 2", id: "yI5UU4wMMBQ" },
+                { name: "Phàn Đòn Đá Tạt Số 2", id: "GpBD8oefXk4" },
+                { name: "Nắm Tóc Sau Số 4", id: "flNQFCyTIgg" }
+            ];
+
+            // Render danh sách
+            techniques.forEach((tech, index) => {
+                const stt = index + 1;
+                const li = document.createElement('li');
+                
+                // Số thứ tự
+                const numberDiv = document.createElement('div');
+                numberDiv.className = 'list-number';
+                numberDiv.textContent = stt;
+                li.appendChild(numberDiv);
+                
+                // Tên thế võ
+                const textSpan = document.createElement('span');
+                textSpan.textContent = tech.name;
+                li.appendChild(textSpan);
+
+                // Set active cho item đầu tiên
+                if (index === 0) {
+                    li.classList.add('active');
+                }
+
+                // Xử lý sự kiện click
+                li.addEventListener('click', function() {
+                    // Xóa class active ở các li khác
+                    document.querySelectorAll('.playlist li').forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    
+                    // Thêm class active cho li được chọn
+                    this.classList.add('active');
+
+                    // Đổi tiêu đề
+                    currentVideoTitle.textContent = `${stt}. ${tech.name}`;
+
+                    // Đổi link YouTube iframe (thêm autoplay=1 để tự động phát khi bấm)
+                    mainPlayer.src = `https://www.youtube.com/embed/${tech.id}?autoplay=1&rel=0`;
+                });
+
+                playlist.appendChild(li);
+            });
+        });
+    </script>
+</body>
+</html>
