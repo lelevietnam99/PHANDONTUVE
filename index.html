@@ -13,7 +13,7 @@
             padding: 0;
         }
 
-        /* Nền thiên nhiên thuần túy (không người, không ký tự) */
+        /* Nền thiên nhiên thuần túy */
         body {
             background-color: #1a251e;
             background-image: linear-gradient(rgba(14, 28, 20, 0.75), rgba(14, 28, 20, 0.85)), 
@@ -65,7 +65,7 @@
         /* Cột trái: Bảng danh sách đòn thế */
         .playlist-container {
             flex: 1;
-            min-width: 340px;
+            min-width: 350px;
             max-width: 450px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
@@ -117,7 +117,7 @@
 
         /* Từng mục đòn thế */
         .playlist li {
-            padding: 14px 18px;
+            padding: 10px 14px;
             margin-bottom: 8px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 10px;
@@ -161,6 +161,32 @@
         .playlist li.active .list-number {
             background: #2ecc71;
             color: #1a251e;
+        }
+
+        .tech-name {
+            flex: 1; /* Chiếm hết phần không gian còn lại để đẩy nút link sang sát mép phải */
+        }
+
+        /* Nút mở tab mới */
+        .external-link-btn {
+            background: rgba(255, 255, 255, 0.08);
+            color: #a8d5ba;
+            border-radius: 8px;
+            padding: 8px 12px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .external-link-btn:hover {
+            background: #2ecc71;
+            color: #1a251e;
+            border-color: #2ecc71;
+            transform: scale(1.05);
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
         }
 
         /* Cột phải: Trình phát video YouTube */
@@ -267,7 +293,7 @@
             const mainPlayer = document.getElementById('mainPlayer');
             const currentVideoTitle = document.getElementById('currentVideoTitle').querySelector('span');
             
-            // Dữ liệu 27 thế phản đòn và ID video YouTube tương ứng
+            // Dữ liệu 27 thế phản đòn và ID video YouTube
             const techniques = [
                 { name: "Phản Đòn Đá Ngang Số 2", id: "P3T0YNTADWw" },
                 { name: "Phản Đòn Đá Thẳng Số 2", id: "6BBbSxlwYjg" },
@@ -311,15 +337,31 @@
                 
                 // Tên thế võ
                 const textSpan = document.createElement('span');
+                textSpan.className = 'tech-name';
                 textSpan.textContent = tech.name;
                 li.appendChild(textSpan);
+
+                // Nút liên kết mở YouTube bên ngoài
+                const externalLink = document.createElement('a');
+                externalLink.href = `https://youtu.be/${tech.id}`;
+                externalLink.target = "_blank";
+                externalLink.className = "external-link-btn";
+                externalLink.title = "Mở video trong tab/ứng dụng mới";
+                externalLink.innerHTML = '<i class="fas fa-external-link-alt"></i>';
+                
+                // Bắt buộc thêm e.stopPropagation() để không kích hoạt nhầm lệnh đổi iframe của thẻ li
+                externalLink.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+                
+                li.appendChild(externalLink);
 
                 // Set active cho item đầu tiên
                 if (index === 0) {
                     li.classList.add('active');
                 }
 
-                // Xử lý sự kiện click
+                // Xử lý sự kiện click trên từng mục để tải vào trình phát iframe
                 li.addEventListener('click', function() {
                     // Xóa class active ở các li khác
                     document.querySelectorAll('.playlist li').forEach(item => {
